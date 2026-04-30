@@ -9,6 +9,12 @@
 #define ADJ 3
 #define EXTRA 4
 
+&mt {
+    flavor = "balanced";
+    quick-tap-ms = <200>;
+    require-prior-idle-ms = <125>;
+};
+
 / {
     behaviors {
         hm: homerow_mods {

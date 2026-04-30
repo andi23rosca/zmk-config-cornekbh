@@ -108,12 +108,11 @@
 
         SYM {
             display-name = "Symbols";
-
             bindings = <
-&trans  &kp LPAR   &kp LBKT   &kp LBRC   &kp LESS_THAN  &kp PRCNT    &kp CARET  &kp ASTRK  &kp PLUS   &kp BSLH  &kp PIPE  &trans
-&trans  &kp RPAR   &kp RBKT   &kp RBRC   &kp GREATER_THAN &kp DLLR     &kp UNDER  &kp MINUS  &kp EQUAL  &kp EXCL  &kp AMPS  &trans
-&trans  &kp TILDE  &kp GRAVE  &kp HASH   &kp AT         &kp PRCNT    &kp TILDE  &kp QMARK  &trans     &trans    &trans    &trans
-                              &kp LGUI   &mo 3          &kp SPACE    &kp RET    &trans     &trans
+&trans  &kp LPAR   &kp LBKT   &kp LBRC  &kp LESS_THAN     &kp PRCNT    &kp CARET  &kp ASTRK  &kp PLUS   &kp BSLH  &kp PIPE  &trans
+&trans  &kp RPAR   &kp RBKT   &kp RBRC  &kp GREATER_THAN  &kp DLLR     &kp UNDER  &kp MINUS  &kp EQUAL  &kp EXCL  &kp AMPS  &trans
+&trans  &kp TILDE  &kp GRAVE  &kp HASH  &kp AT            &kp PRCNT    &kp TILDE  &kp QMARK  &trans     &trans    &trans    &trans
+                              &kp LGUI  &mo 3             &kp SPACE    &kp RET    &trans     &trans
             >;
         };
 
@@ -130,10 +129,10 @@
         EXTRA {
             display-name = "Extra";
             bindings = <
-&trans  &trans  &trans          &trans          &trans           &msc SCRL_UP      &trans            &trans           &trans             &trans  &trans  &trans
-&trans  &trans  &trans          &mmv MOVE_UP    &trans           &msc SCRL_DOWN    &trans            &mkp LCLK        &mkp RCLK          &trans  &trans  &trans
-&trans  &trans  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &trans            &trans            &kp K_MUTE       &trans             &trans  &trans  &trans
-                                &trans          &trans           &trans            &kp K_PLAY_PAUSE  &kp C_VOLUME_UP  &kp C_VOLUME_DOWN
+&trans  &trans  &trans          &trans                &trans                &msc SCRL_UP      &trans            &trans           &trans             &trans  &trans  &trans
+&trans  &trans  &trans          &mmv MOVE_UP          &trans                &msc SCRL_DOWN    &trans            &mkp LCLK        &mkp RCLK          &trans  &trans  &trans
+&trans  &trans  &mmv MOVE_LEFT  &mmv MOVE_DOWN        &mmv MOVE_RIGHT       &trans            &trans            &kp K_MUTE       &trans             &trans  &trans  &trans
+                                &kp C_BRIGHTNESS_DEC  &kp C_BRIGHTNESS_INC  &trans            &kp K_PLAY_PAUSE  &kp C_VOLUME_UP  &kp C_VOLUME_DOWN
             >;
         };
     };

@@ -1,3 +1,4 @@
+
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
@@ -8,15 +9,45 @@
 #define SYM 2
 #define ADJ 3
 #define EXTRA 4
+#define SCULPT 5
+
+// --------------------------------------------------
+// DEFAULT MOD-TAPS
+// Conservative behavior to prevent rollover errors
+// --------------------------------------------------
 
 &mt {
     flavor = "balanced";
+    tapping-term-ms = <200>;
     quick-tap-ms = <200>;
     require-prior-idle-ms = <125>;
 };
 
 / {
     behaviors {
+
+        // ------------------------------------------
+        // QMK-LIKE SHIFT
+        // No prior-idle suppression.
+        // Designed to favor tap during fast rollover.
+        // ------------------------------------------
+
+        qshift: qmk_like_shift {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
+
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <0>;
+            require-prior-idle-ms = <0>;
+        };
+
+        // ------------------------------------------
+        // ORIGINAL CUSTOM HOME-ROW MODIFIERS
+        // Preserved for compatibility
+        // ------------------------------------------
+
         hm: homerow_mods {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -25,13 +56,14 @@
             bindings = <&kp>, <&kp>;
 
             quick-tap-ms = <180>;
-            require-prior-idle-ms = <120>; /* tune to taste */
+            require-prior-idle-ms = <120>;
         };
 
         para: para {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            bindings = <&kp LEFT_PARENTHESIS>, <&kp RIGHT_PARENTHESIS>;
+            bindings = <&kp LEFT_PARENTHESIS>,
+                       <&kp RIGHT_PARENTHESIS>;
         };
 
         caps: caps {
@@ -42,25 +74,30 @@
 
         paraless: paraless {
             compatible = "zmk,behavior-mod-morph";
-            bindings = <&kp LEFT_PARENTHESIS>, <&kp LESS_THAN>;
-
             #binding-cells = <0>;
+            bindings = <&kp LEFT_PARENTHESIS>,
+                       <&kp LESS_THAN>;
             mods = <(MOD_LSFT)>;
         };
 
         paragreat: paragreat {
             compatible = "zmk,behavior-mod-morph";
-            bindings = <&kp RIGHT_PARENTHESIS>, <&kp GREATER_THAN>;
-
             #binding-cells = <0>;
+            bindings = <&kp RIGHT_PARENTHESIS>,
+                       <&kp GREATER_THAN>;
             mods = <(MOD_LSFT)>;
         };
     };
+
+    // ----------------------------------------------
+    // MACROS
+    // ----------------------------------------------
 
     macros {
         browsertab: browsertab {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
+
             bindings =
                 <&macro_press>,
                 <&kp LCTRL>,
@@ -71,74 +108,127 @@
         };
     };
 
-    combos { compatible = "zmk,combos"; };
+    combos {
+        compatible = "zmk,combos";
+    };
 
-    //
+    // ==============================================
+    // KEYMAP
+    // ==============================================
 
     keymap {
         compatible = "zmk,keymap";
 
+        // ------------------------------------------
+        // 0 - BASE
+        // ------------------------------------------
+
         DEF {
             display-name = "Base";
 
-            // -----------------------------------------------------------------------------------------
-            // |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U   |  I  |  O  |  P  |
-            // |  A  |  S  |  D  |  F  |  G  |   |  H  |  J   |  K  |  L  |  ;  |
-            // |  Z  |  X  |  C  |  V  |  B  |   |  N  |  M   |  ,  |  .  |  /  |
-            // | GUI | CTRL | SHFT | LWR | SPC |   | ENT | RSE  | BKSP | ALT | ESC |
-
             bindings = <
-&mt LEFT_ALT TAB      &kp Q           &kp W  &kp E          &kp R        &kp T        &kp Y    &kp U           &kp I              &kp O    &kp P               &mt RIGHT_CONTROL ESCAPE
-&mt LCTRL BACKSPACE   &kp A           &kp S  &kp D          &kp F        &kp G        &kp H    &kp J           &kp K              &kp L    &lt 4 SEMICOLON     &mt LEFT_CONTROL SINGLE_QUOTE
-&mt LEFT_SHIFT GRAVE  &mt LEFT_GUI Z  &kp X  &kp C          &kp V        &kp B        &kp N    &kp M           &kp COMMA          &kp DOT  &mt LEFT_GUI SLASH  &mt RIGHT_SHIFT MINUS
-                                             &mt LGUI LEFT  &lt 1 RIGHT  &kp SPACE    &kp RET  &lt 2 UP_ARROW  &mt LEFT_ALT DOWN
+                &mt LEFT_ALT TAB      &kp Q          &kp W             &kp E           &kp R          &kp T       &kp Y      &kp U           &kp I        &kp O       &kp P                  &mt RIGHT_CONTROL ESCAPE
+                &mt LCTRL BACKSPACE   &kp A          &kp S             &kp D           &kp F          &kp G       &kp H      &kp J           &kp K        &kp L       &lt EXTRA SEMICOLON     &mt LEFT_CONTROL SINGLE_QUOTE
+                &qshift LSHIFT GRAVE  &mt LEFT_GUI Z &kp X             &kp C           &kp V          &kp B       &kp N      &kp M           &kp COMMA    &kp DOT     &mt LEFT_GUI SLASH     &qshift RSHIFT MINUS
+
+                                                        &mt LGUI LEFT   &lt NAV RIGHT    &kp SPACE       &kp RET    &lt SYM UP_ARROW    &mt LEFT_ALT DOWN
             >;
         };
+
+        // ------------------------------------------
+        // 1 - NAVIGATION + NUMBERS
+        //
+        // NEW:
+        // NAV + A enters SCULPT mode.
+        // ------------------------------------------
 
         NAV {
             display-name = "NavNum";
 
-            // -----------------------------------------------------------------------------------------
-            // |  TAB |  1  |  2  |  3  |  4  |  5  |   |  6  |  7  |  8  |  9  |  0  | BKSP |
-            // | BTCLR| BT1 | BT2 | BT3 | BT4 | BT5 |   | LFT | DWN |  UP | RGT |     |      |
-            // | SHFT |     |     |     |     |     |   |     |     |     |     |     |      |
-            // | GUI | CTRL | SHFT | LWR | SPC |   | ENT | RSE  | BKSP | ALT | ESC |
-
             bindings = <
-&trans      &kp N1  &kp N2    &kp N3        &kp N4           &kp N5           &kp N6   &kp N7  &kp N8  &kp N9  &kp N0  &trans
-&caps_word  &trans  &trans    &kp UP_ARROW  &browsertab      &kp PAGE_UP      &kp N0   &kp N4  &kp N5  &kp N6  &trans  &trans
-&trans      &trans  &kp LEFT  &kp DOWN      &kp RIGHT_ARROW  &kp PAGE_DOWN    &trans   &kp N1  &kp N2  &kp N3  &trans  &trans
-                              &kp LGUI      &trans           &kp SPACE        &kp RET  &mo 3   &trans
+                &trans       &kp N1        &kp N2        &kp N3          &kp N4          &kp N5         &kp N6     &kp N7       &kp N8        &kp N9       &kp N0      &trans
+                &caps_word   &to SCULPT    &trans        &kp UP_ARROW    &browsertab     &kp PAGE_UP    &kp N0     &kp N4       &kp N5        &kp N6       &trans      &trans
+                &trans       &trans        &kp LEFT      &kp DOWN        &kp RIGHT_ARROW &kp PAGE_DOWN  &trans     &kp N1       &kp N2        &kp N3       &trans      &trans
+
+                                                        &kp LGUI        &trans          &kp SPACE      &kp RET    &mo ADJ       &trans
             >;
         };
+
+        // ------------------------------------------
+        // 2 - SYMBOLS
+        // ------------------------------------------
 
         SYM {
             display-name = "Symbols";
+
             bindings = <
-&trans  &kp LPAR   &kp LBKT   &kp LBRC  &kp LESS_THAN     &kp PRCNT    &kp CARET  &kp ASTRK  &kp PLUS   &kp BSLH  &kp PIPE  &trans
-&trans  &kp RPAR   &kp RBKT   &kp RBRC  &kp GREATER_THAN  &kp DLLR     &kp UNDER  &kp MINUS  &kp EQUAL  &kp EXCL  &kp AMPS  &trans
-&trans  &kp TILDE  &kp GRAVE  &kp HASH  &kp AT            &kp PRCNT    &kp TILDE  &kp QMARK  &trans     &trans    &trans    &trans
-                              &kp LGUI  &mo 3             &kp SPACE    &kp RET    &trans     &trans
+                &trans       &kp LPAR      &kp LBKT      &kp LBRC       &kp LESS_THAN     &kp PRCNT     &kp CARET   &kp ASTRK     &kp PLUS     &kp BSLH     &kp PIPE     &trans
+                &trans       &kp RPAR      &kp RBKT      &kp RBRC       &kp GREATER_THAN  &kp DLLR      &kp UNDER   &kp MINUS     &kp EQUAL    &kp EXCL     &kp AMPS     &trans
+                &trans       &kp TILDE     &kp GRAVE     &kp HASH       &kp AT            &kp PRCNT     &kp TILDE   &kp QMARK     &trans       &trans       &trans       &trans
+
+                                                        &kp LGUI        &mo ADJ          &kp SPACE      &kp RET     &trans       &trans
             >;
         };
+
+        // ------------------------------------------
+        // 3 - SYSTEM
+        // ------------------------------------------
 
         ADJ {
             display-name = "System";
+
             bindings = <
-&trans  &kp F1        &kp F2        &kp F3        &kp F4      &kp F5            &kp F6  &kp F7  &kp F8  &kp F9  &kp F10      &trans
-&trans  &kp F11       &kp F12       &trans        &trans      &studio_unlock    &trans  &trans  &trans  &trans  &trans       &trans
-&trans  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &bt BT_CLR_ALL    &trans  &trans  &trans  &trans  &bootloader  &trans
-                                    &trans        &trans      &trans            &trans  &trans  &trans
+                &trans       &kp F1         &kp F2         &kp F3        &kp F4          &kp F5           &kp F6    &kp F7       &kp F8     &kp F9     &kp F10       &trans
+                &trans       &kp F11        &kp F12        &trans        &trans          &studio_unlock   &trans    &trans       &trans     &trans     &trans        &trans
+                &trans       &bt BT_SEL 0   &bt BT_SEL 1   &bt BT_SEL 2  &bt BT_CLR       &bt BT_CLR_ALL   &trans    &trans       &trans     &trans     &bootloader   &trans
+
+                                                          &trans        &trans          &trans           &trans    &trans       &trans
             >;
         };
 
+        // ------------------------------------------
+        // 4 - EXTRA / MOUSE / MEDIA
+        // ------------------------------------------
+
         EXTRA {
             display-name = "Extra";
+
             bindings = <
-&trans  &trans  &trans          &trans                &trans                &msc SCRL_UP      &trans            &trans           &trans             &trans  &trans  &trans
-&trans  &trans  &trans          &mmv MOVE_UP          &trans                &msc SCRL_DOWN    &trans            &mkp LCLK        &mkp RCLK          &trans  &trans  &trans
-&trans  &trans  &mmv MOVE_LEFT  &mmv MOVE_DOWN        &mmv MOVE_RIGHT       &trans            &trans            &kp K_MUTE       &trans             &trans  &trans  &trans
-                                &kp C_BRIGHTNESS_DEC  &kp C_BRIGHTNESS_INC  &trans            &kp K_PLAY_PAUSE  &kp C_VOLUME_UP  &kp C_VOLUME_DOWN
+                &trans       &trans                 &trans           &trans          &trans              &msc SCRL_UP       &trans    &trans           &trans           &trans    &trans             &trans
+                &trans       &trans                 &trans           &mmv MOVE_UP    &trans              &msc SCRL_DOWN     &trans    &mkp LCLK        &mkp RCLK        &trans    &trans             &trans
+                &trans       &trans                 &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT     &trans             &trans    &kp K_MUTE       &trans           &trans    &trans             &trans
+
+                                                            &kp C_BRIGHTNESS_DEC   &kp C_BRIGHTNESS_INC   &trans    &kp K_PLAY_PAUSE   &kp C_VOLUME_UP    &kp C_VOLUME_DOWN
+            >;
+        };
+
+        // ==========================================
+        // 5 - SCULPT MODE
+        //
+        // Enter: NAV + A
+        // Exit:  Top-left key (normally Tab/Alt)
+        //
+        // Left thumb keys:
+        // Shift / Ctrl / Alt
+        //
+        // Right half kept transparent.
+        // ==========================================
+
+        SCULPT {
+            display-name = "Sculpt";
+
+            bindings = <
+                // Top row
+                &to DEF      &kp N1          &kp N2          &kp N3       &kp N4       &kp N5       &trans    &trans    &trans    &trans    &trans    &trans
+
+                // Home row
+                &mkp MCLK    &kp SPACE       &kp LC(Z)       &kp LC(LS(Z)) &kp F       &kp LS(F)    &trans    &trans    &trans    &trans    &trans    &trans
+
+                // Bottom row
+                &kp ESCAPE   &kp LG(Z)       &kp LG(LS(Z))   &kp S         &kp B       &kp LS(SPACE) &trans    &trans    &trans    &trans    &trans    &trans
+
+                // Thumbs
+                                                    &kp LSHIFT    &kp LCTRL    &kp LALT    &trans    &trans    &trans
             >;
         };
     };
